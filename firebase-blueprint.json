@@ -1,0 +1,117 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user profile information and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique ID of the user." },
+        "displayName": { "type": "string", "description": "The display name of the user." },
+        "email": { "type": "string", "description": "The email address of the user." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "The time the user profile was created." }
+      },
+      "required": ["uid", "email"]
+    },
+    "Interview": {
+      "title": "Interview Session",
+      "description": "Represents a single mock interview session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the interview." },
+        "userId": { "type": "string", "description": "The ID of the user who took the interview." },
+        "role": { "type": "string", "description": "The job role for the interview." },
+        "jobDescription": { "type": "string", "description": "The job description provided." },
+        "resumeText": { "type": "string", "description": "The text extracted from the resume." },
+        "status": { "type": "string", "enum": ["pending", "in-progress", "completed"], "description": "The current status of the interview." },
+        "overallScore": { "type": "number", "description": "The overall score for the interview." },
+        "overallFeedback": { "type": "string", "description": "General feedback for the interview." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "The time the interview was started." }
+      },
+      "required": ["userId", "role", "status", "createdAt"]
+    },
+    "Question": {
+      "title": "Interview Question",
+      "description": "A specific question generated for an interview.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the question." },
+        "interviewId": { "type": "string", "description": "The ID of the interview this question belongs to." },
+        "text": { "type": "string", "description": "The text of the question." },
+        "type": { "type": "string", "enum": ["technical", "hr", "behavioral"], "description": "The category of the question." },
+        "order": { "type": "number", "description": "The order of the question in the interview." }
+      },
+      "required": ["interviewId", "text", "type", "order"]
+    },
+    "Answer": {
+      "title": "User Answer",
+      "description": "The user's response to a question and its evaluation.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The unique ID of the answer." },
+        "interviewId": { "type": "string", "description": "The ID of the interview." },
+        "questionId": { "type": "string", "description": "The ID of the question." },
+        "answerText": { "type": "string", "description": "The text of the user's answer." },
+        "score": { "type": "number", "description": "The score for this specific answer (0-100)." },
+        "feedback": { "type": "string", "description": "AI feedback for this answer." },
+        "improvedAnswer": { "type": "string", "description": "AI-rewritten improved version of the answer." },
+        "clarity": { "type": "number", "description": "Clarity score." },
+        "relevance": { "type": "number", "description": "Relevance score." },
+        "confidence": { "type": "number", "description": "Confidence score." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "The time the answer was submitted." }
+      },
+      "required": ["interviewId", "questionId", "answerText", "score", "createdAt"]
+    },
+    "UserProgress": {
+      "title": "User Progress",
+      "description": "Aggregated progress data for a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "interviewId": { "type": "string" },
+        "score": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" },
+        "weakAreas": { "type": "array", "items": { "type": "string" } },
+        "improvementTags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["userId", "interviewId", "score", "date"]
+    },
+    "CodingProblem": {
+      "title": "Coding Problem",
+      "description": "A coding challenge for the user.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "difficulty": { "type": "string", "enum": ["Easy", "Medium", "Hard"] },
+        "description": { "type": "string" },
+        "testCases": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["title", "difficulty", "description"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/interviews/{interviewId}": {
+      "schema": "Interview",
+      "description": "Mock interview sessions."
+    },
+    "/interviews/{interviewId}/questions/{questionId}": {
+      "schema": "Question",
+      "description": "Questions for a specific interview."
+    },
+    "/interviews/{interviewId}/answers/{answerId}": {
+      "schema": "Answer",
+      "description": "User answers for a specific interview."
+    },
+    "/userProgress/{progressId}": {
+      "schema": "UserProgress",
+      "description": "User progress tracking."
+    },
+    "/codingProblems/{problemId}": {
+      "schema": "CodingProblem",
+      "description": "Coding challenges library."
+    }
+  }
+}

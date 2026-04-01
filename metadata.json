@@ -1,0 +1,5 @@
+{
+  "name": "AI Smart Interview Assistant",
+  "description": "An AI-powered platform that analyzes resumes, generates personalized interview questions, and provides real-time feedback and scoring for mock interviews.",
+  "requestFramePermissions": ["microphone"]
+}
