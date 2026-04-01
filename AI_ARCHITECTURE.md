@@ -59,3 +59,32 @@ Instead of proxying heavy audio blobs to an external server-side transcription s
   }
   ```
 * **Advantage**: Zero API costs for audio-processing, zero-latency feedback for the user, and complete user-privacy since the raw audio stream never leaves the client device.
+
+---
+
+## 3. Codebase Integration Mapping
+
+Understanding how the intelligence layer flows into the active application workspace.
+
+### A. Environment Configuration (`.env` & `package.json`)
+* The core API token (`GEMINI_API_KEY`) is injected client-side by Vite.
+* `npm run dev` orchestrates the local deployment, launching the frontend alongside the backend API required to parse PDF blobs securely into plaintext context for the LLM.
+
+### B. Core Intelligence Service (`src/lib/gemini.ts`)
+* Acts as the single-source-of-truth service abstraction for all direct LLM interactions. 
+* All generative functionality relies on the `@google/genai` module instantiated here via: 
+  `const ai = new GoogleGenAI({ apiKey: ... })`.
+* Maps input payload parameters (e.g., `resumeText`, `jobDescription`, `code`) directly into strict templated prompt sequences.
+
+### C. Backend Pre-Processing (`server.ts`)
+* **Role**: Extracts vital ML context. 
+* Contains the `POST /api/parse-pdf` middleware endpoint parsing uploaded PDF resumes via `pdf-parse` into clean, LLM-digestible plaintext so that Gemini can act on the candidate's exact resume history.
+
+### D. User Interface Integration (`src/App.tsx`)
+* Contains the **State Lifecycle** tying user interactions to the `gemini.ts` LLM methods.
+    1. Evaluates setup text via `/api/parse-pdf`.
+    2. Invokes `generateQuestions()` on-load to build the dynamic interview queue in state.
+    3. Handles real-time Web Speech API transcription, feeding `transcript` state into the `<textarea>` using the `recognition.onresult` ML integration block.
+    4. Triggers `evaluateAnswer()` and `rewriteAnswer()` when the user submits their vocal response.
+    5. Reads text from the embedded `<Editor>` and invokes `evaluateCode()` upon algorithmic script submission.
+* Passes the final evaluated JSON data (which originally came from Gemini responses) directly to the Recharts library and Firebase Firestore for historical aggregation and tracking.
